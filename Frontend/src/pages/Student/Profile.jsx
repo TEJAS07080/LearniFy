@@ -130,7 +130,7 @@ export default function ProfilePage() {
         if (courses && courses.length > 0) {
             fetchAssignments();
         }
-    }, [courses, user._id]);
+    }, [user._id]);
 
     return (
         <Container maxW="container.xl" py={8}>
