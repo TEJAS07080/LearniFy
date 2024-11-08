@@ -30,6 +30,24 @@ const theme = extendTheme({
       600: "#1e88e5",
     },
   },
+  styles: {
+    global: {
+      ".react-calendar": {
+        borderRadius: "16px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        backgroundColor: "white",
+        padding: "20px",
+      },
+      ".react-calendar__tile--active": {
+        backgroundColor: "#2196f3 !important",
+        color: "white",
+        borderRadius: "8px",
+      },
+      ".react-calendar__navigation button": {
+        color: "#2196f3",
+      },
+    },
+  },
 });
 
 export default function AssignmentCalendar() {
@@ -50,6 +68,7 @@ export default function AssignmentCalendar() {
         );
         if (response.data.success) {
           setDeadlines(response.data.deadlines);
+          console.log(response.data);
         } else {
           setError("Failed to fetch deadlines.");
         }
@@ -67,7 +86,7 @@ export default function AssignmentCalendar() {
     return new Date(dateString).toDateString();
   };
 
-  // Tailwind-based coloring for calendar tiles
+  // Calendar tile styling for deadlines
   const tileClassName = ({ date, view }) => {
     if (view === "month") {
       const deadline = deadlines.find(
@@ -75,9 +94,7 @@ export default function AssignmentCalendar() {
       );
 
       if (deadline) {
-        return deadline.submitted
-          ? "submitted" // Add specific classes for submitted
-          : "unsubmitted"; // And unsubmitted
+        return deadline.submitted ? "submitted" : "unsubmitted";
       }
     }
     return null;
@@ -85,69 +102,61 @@ export default function AssignmentCalendar() {
 
   return (
     <ChakraProvider theme={theme}>
-      <Container maxW="container.xl" py={8}>
-        <VStack spacing={8} align="stretch">
-          <Heading as="h1" size="xl" textAlign="center" color="brand.600">
-            Assignment Calendar
-          </Heading>
-          <Box
-            bg={bgColor}
-            borderRadius="lg"
-            borderWidth={1}
-            borderColor={borderColor}
-            p={6}
-            boxShadow="lg">
-            <Flex
-              direction={{ base: "column", md: "row" }}
-              justify="center"
-              align="center">
-              <Box width={{ base: "100%", md: "auto" }} mb={{ base: 6, md: 0 }}>
-                <Calendar
-                  onChange={setSelectedDate}
-                  value={selectedDate}
-                  tileClassName={tileClassName}
-                  className="mx-auto"
-                />
-              </Box>
-              <Box
-                ml={{ base: 0, md: 8 }}
-                width={{ base: "100%", md: "300px" }}>
-                <Heading as="h3" size="md" mb={4} color="brand.600">
-                  Upcoming Deadlines
-                </Heading>
-                <VStack
-                  align="stretch"
-                  spacing={3}
-                  maxH="300px"
-                  overflowY="auto">
-                  {deadlines.length > 0 ? (
-                    deadlines.map((deadline) => (
-                      <Flex
-                        key={deadline._id}
-                        align="center"
-                        justify="space-between">
-                        <Text color={textColor}>{deadline.title}</Text>
-                        <Badge
-                          colorScheme={deadline.submitted ? "green" : "red"}>
-                          {new Date(deadline.deadline).toLocaleDateString()}
-                        </Badge>
-                      </Flex>
-                    ))
-                  ) : (
-                    <Text color="gray.500">No upcoming deadlines.</Text>
-                  )}
-                </VStack>
-              </Box>
-            </Flex>
-          </Box>
-          {error && (
-            <Alert status="error">
-              <AlertIcon />
-              <AlertTitle mr={2}>Error!</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-        </VStack>
+      <Container maxW="container.md" py={8}>
+        <Heading as="h1" size="xl" textAlign="center" color="brand.600" mb={6}>
+          Assignment Calendar
+        </Heading>
+        <Box
+          bg={bgColor}
+          borderRadius="lg"
+          borderWidth={1}
+          borderColor={borderColor}
+          p={6}
+          boxShadow="lg"
+        >
+          <Flex direction={{ base: "column", md: "row" }} gap={6} align="start">
+            <Box flex="1">
+              <Calendar
+                onChange={setSelectedDate}
+                value={selectedDate}
+                tileClassName={tileClassName}
+              />
+            </Box>
+            <Box flex="1">
+              <Heading as="h3" size="md" mb={4} color="brand.600">
+                Upcoming Deadlines
+              </Heading>
+              <VStack align="stretch" spacing={3} maxH="300px" overflowY="auto">
+                {deadlines.length > 0 ? (
+                  deadlines.map((deadline) => (
+                    <Flex
+                      key={deadline._id}
+                      align="center"
+                      justify="space-between"
+                      flexDirection="column"
+                    >
+                      <Text color={textColor} fontWeight="bold">
+                        {deadline.title}
+                      </Text>
+                      <Badge colorScheme={deadline.submitted ? "green" : "red"}>
+                        Due: {new Date(deadline.deadline).toLocaleDateString()}
+                      </Badge>
+                    </Flex>
+                  ))
+                ) : (
+                  <Text color="gray.500">No upcoming deadlines.</Text>
+                )}
+              </VStack>
+            </Box>
+          </Flex>
+        </Box>
+        {error && (
+          <Alert status="error" mt={6}>
+            <AlertIcon />
+            <AlertTitle mr={2}>Error!</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
       </Container>
     </ChakraProvider>
   );
