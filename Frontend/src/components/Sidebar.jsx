@@ -6,6 +6,7 @@ import { FaBlog, FaCalendarAlt } from "react-icons/fa";
 import { MdOutlineMenuBook } from "react-icons/md";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { IoChatbubbleEllipses } from "react-icons/io5";
 import { useToast } from "@chakra-ui/react";
 
 export const Example = () => {
@@ -83,10 +84,18 @@ const Sidebar = () => {
             open={open}
           />
         </Link>
+        <Link to={"/home/chat"}>
+          <Option
+            Icon={IoChatbubbleEllipses}
+            title="Chat"
+            selected={selected}
+            setSelected={setSelected}
+            open={open}
+          />
+        </Link>
         <Link
-          to={`${
-            user.role === "Student" ? "profile" : "teacherProfile"
-          }`}
+          to={`${user.role === "Student" ? "profile" : "teacherProfile"
+            }`}
         >
           <Option
             Icon={CgProfile}
@@ -109,11 +118,10 @@ const Option = ({ Icon, title, selected, setSelected, open, notifs }) => {
       layout
       onClick={() => setSelected(title)}
       className={`relative flex h-12 w-full items-center rounded-md transition-colors 
-                ${
-                  selected === title
-                    ? "bg-indigo-100 text-indigo-800"
-                    : "text-slate-500"
-                }
+                ${selected === title
+          ? "bg-indigo-100 text-indigo-800"
+          : "text-slate-500"
+        }
                 ${!selected && "hover:bg-slate-100 hover:text-slate-700"}`} // Added hover effect
     >
       <motion.div
@@ -166,7 +174,7 @@ const TitleSection = ({ open }) => {
               transition={{ delay: 0.125 }}
             >
               <span className="block text-xs font-semibold text-black">
-                Eduverse
+                LearniFy
               </span>
             </motion.div>
           )}
@@ -218,9 +226,8 @@ const ToggleClose = ({ open, setOpen }) => {
           className="grid size-10 place-content-center text-lg"
         >
           <FiChevronsRight
-            className={`transition-transform ${
-              open && "rotate-180"
-            } text-black`}
+            className={`transition-transform ${open && "rotate-180"
+              } text-black`}
           />
         </motion.div>
         {open && (
