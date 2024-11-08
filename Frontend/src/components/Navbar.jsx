@@ -15,7 +15,7 @@ const Navbar = () => {
     return (
         <nav className='flex justify-between items-center px-2 py-2 gap-5'>
             <div className='flex'>
-                <h1 className='text-3xl font-bold text-blue-600'>EduVerse</h1>
+                <h1 className='text-3xl font-bold text-blue-600'>LearniFy</h1>
             </div>
             <div className='flex items-center justify-start gap-5'>
                 {token ? (

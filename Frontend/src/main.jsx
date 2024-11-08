@@ -19,6 +19,7 @@ import Blog from "./pages/Blog.jsx";
 import TeacherCourse from './components/TeacherCourse.jsx'
 import SignLanguageCourse from "./pages/SignLangugae/signLangCoursePage.jsx";
 import ChakraCalendar from "./pages/Student/Calendar.jsx";
+import Chat from "./pages/Student/Chat.jsx";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {
         path: "teacher",
         element: <ViewTeacherCourse />,
+      },
+      {
+        path: "chat",
+        element: <Chat />,
       },
       {
         path: "",
@@ -93,8 +98,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   // <StrictMode>
-    <ChakraProvider>
-      <RouterProvider router={router} />
-    </ChakraProvider>
+  <ChakraProvider>
+    <RouterProvider router={router} />
+  </ChakraProvider>
   /* </StrictMode> */
 );

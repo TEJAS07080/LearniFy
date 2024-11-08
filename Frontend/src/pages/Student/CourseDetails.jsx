@@ -357,14 +357,13 @@ export default function CoursePage() {
       {user.role == 'Teacher' && <Button color={"teal"} onClick={() => handleGenerateQuiz()} m={5}>
         Generate Quiz
       </Button>}
-      {user.role == 'Teacher' && roadmaps.length===0 && roadmap.length===0 && <Button color={"teal"} onClick={() => handleGenerateRoadmap()} m={5}>
+      {user.role == 'Teacher' && roadmaps.length === 0 && roadmap.length === 0 && <Button color={"teal"} onClick={() => handleGenerateRoadmap()} m={5}>
         Generate Roadmap
       </Button>}
       {/* Conditionally render the "Take Quiz" button */}
       {selectedCourse.name === "Sign Language" && (
         <Button
           color={"teal"}
-          onClick={() => window.open("http://localhost:8502/")}
           m={5}
         >
           Learn
