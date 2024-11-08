@@ -166,7 +166,7 @@ const TitleSection = ({ open }) => {
               transition={{ delay: 0.125 }}
             >
               <span className="block text-xs font-semibold text-black">
-                Mexus
+                Eduverse
               </span>
             </motion.div>
           )}
