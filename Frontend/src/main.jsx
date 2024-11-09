@@ -20,6 +20,7 @@ import TeacherCourse from './components/TeacherCourse.jsx'
 import SignLanguageCourse from "./pages/SignLangugae/signLangCoursePage.jsx";
 import ChakraCalendar from "./pages/Student/Calendar.jsx";
 import Chat from "./pages/Student/Chat.jsx";
+import ChatbotInterface from "./pages/Student/ChatBot.jsx";
 
 const router = createBrowserRouter([
   {
@@ -37,7 +38,7 @@ const router = createBrowserRouter([
       },
       {
         path: "chat",
-        element: <Chat />,
+        element: <ChatbotInterface />,
       },
       {
         path: "",
