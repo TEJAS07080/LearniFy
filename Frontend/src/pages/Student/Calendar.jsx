@@ -13,12 +13,14 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import { Calendar } from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import axios from "axios";
 import { host } from "../../APIRoutes";
 import "./calendarStyles.css";
+import { CustomKanban } from "../../components/CustomKanban";
 
 // Extend the theme for custom styles
 const theme = extendTheme({
@@ -37,6 +39,7 @@ const theme = extendTheme({
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
         backgroundColor: "white",
         padding: "20px",
+        height: "auto", // Ensure calendar grows based on its content
       },
       ".react-calendar__tile--active": {
         backgroundColor: "#2196f3 !important",
@@ -68,7 +71,6 @@ export default function AssignmentCalendar() {
         );
         if (response.data.success) {
           setDeadlines(response.data.deadlines);
-          console.log(response.data);
         } else {
           setError("Failed to fetch deadlines.");
         }
@@ -81,18 +83,15 @@ export default function AssignmentCalendar() {
     fetchDeadlines();
   }, [user._id]);
 
-  // Function to format dates for comparison
   const formatDate = (dateString) => {
     return new Date(dateString).toDateString();
   };
 
-  // Calendar tile styling for deadlines
   const tileClassName = ({ date, view }) => {
     if (view === "month") {
       const deadline = deadlines.find(
         (d) => formatDate(d.deadline) === date.toDateString()
       );
-
       if (deadline) {
         return deadline.submitted ? "submitted" : "unsubmitted";
       }
@@ -102,8 +101,8 @@ export default function AssignmentCalendar() {
 
   return (
     <ChakraProvider theme={theme}>
-      <Container maxW="container.md" py={8}>
-        <Heading as="h1" size="xl" textAlign="center" color="brand.600" mb={6}>
+      <Container maxW="100%" px={4} py={10}>
+        <Heading as="h1" size="xl" textAlign="center" color="brand.600" mb={8}>
           Assignment Calendar
         </Heading>
         <Box
@@ -111,47 +110,73 @@ export default function AssignmentCalendar() {
           borderRadius="lg"
           borderWidth={1}
           borderColor={borderColor}
-          p={6}
+          p={8}
           boxShadow="lg"
         >
-          <Flex direction={{ base: "column", md: "row" }} gap={6} align="start">
-            <Box flex="1">
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            gap={8}
+            align={{ base: "center", md: "start" }}
+            justify="space-between" // Ensures even spacing between Calendar and Deadlines
+          >
+            {/* Calendar Section */}
+            <Box flex="1" w="100%" minHeight="500px"> {/* Adjusted minHeight */}
               <Calendar
                 onChange={setSelectedDate}
                 value={selectedDate}
                 tileClassName={tileClassName}
               />
             </Box>
-            <Box flex="1">
+
+            {/* Deadlines Section */}
+            <Box flex="1" w="100%">
               <Heading as="h3" size="md" mb={4} color="brand.600">
                 Upcoming Deadlines
               </Heading>
-              <VStack align="stretch" spacing={3} maxH="300px" overflowY="auto">
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="100%">
                 {deadlines.length > 0 ? (
                   deadlines.map((deadline) => (
-                    <Flex
+                    <Box
                       key={deadline._id}
-                      align="center"
-                      justify="space-between"
-                      flexDirection="column"
+                      p={4}
+                      borderRadius="md"
+                      bg={deadline.submitted ? "green.50" : "red.50"}
+                      border="1px solid"
+                      borderColor={deadline.submitted ? "green.200" : "red.200"}
                     >
-                      <Text color={textColor} fontWeight="bold">
+                      <Text color={textColor} fontWeight="bold" mb={2}>
                         {deadline.title}
                       </Text>
-                      <Badge colorScheme={deadline.submitted ? "green" : "red"}>
+                      <Text color={textColor} mb={2}>
+                        {deadline.description}
+                      </Text>
+                      <Badge
+                        colorScheme={deadline.submitted ? "green" : "red"}
+                        mb={1}
+                      >
                         Due: {new Date(deadline.deadline).toLocaleDateString()}
                       </Badge>
-                    </Flex>
+                    </Box>
                   ))
                 ) : (
                   <Text color="gray.500">No upcoming deadlines.</Text>
                 )}
-              </VStack>
+              </SimpleGrid>
             </Box>
           </Flex>
+
+          {/* Kanban Section */}
+          <Box mt={8} className="overflow-hidden">
+            <Heading as="h3" size="md" color="brand.600" mb={4}>
+              Manager
+            </Heading>
+            <CustomKanban deadlines={deadlines}/>
+          </Box>
         </Box>
+
+        {/* Error Message */}
         {error && (
-          <Alert status="error" mt={6}>
+          <Alert status="error" mt={6} borderRadius="md">
             <AlertIcon />
             <AlertTitle mr={2}>Error!</AlertTitle>
             <AlertDescription>{error}</AlertDescription>

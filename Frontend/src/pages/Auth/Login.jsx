@@ -10,6 +10,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { loginRoute } from '../../APIRoutes/index.js';
 import { motion } from 'framer-motion';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
   const toast = useToast();
@@ -54,7 +55,27 @@ const Login = () => {
     }
   };
 
+  const handleGoogleLogin=async(credentialResponse)=>{
+    //Data fetching
+    try {
+      console.log(credentialResponse);      
+      const { credential } = credentialResponse;
+      const googleToken = credential; // This is the Google OAuth token
+
+      // Now use this token to fetch user details
+      const peopleResponse = await axios.get(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${googleToken}`);
+    
+      const userData = peopleResponse.data;
+      console.log('User Data from Google People API:', userData);
+
+    } catch (error) {
+      console.log(error);
+      alert(error)
+    }
+  }
+
   return (
+        
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
@@ -79,8 +100,9 @@ const Login = () => {
             className="flex flex-col gap-4"
           >
             <FormControl>
-              <FormLabel>Email</FormLabel>
+              <FormLabel style={{color:'black'}}>Email</FormLabel>
               <Input
+                style={{borderColor:'#a3a3a3',color:'black'}}
                 type="email"
                 onChange={(event) => {
                   setUserData({
@@ -91,8 +113,9 @@ const Login = () => {
               />
             </FormControl>
             <FormControl>
-              <FormLabel>Password</FormLabel>
+              <FormLabel style={{color:'black'}}>Password</FormLabel>
               <Input
+                style={{borderColor:'#a3a3a3',color:'black'}}
                 type="password"
                 onChange={(event) => {
                   setUserData({
@@ -118,11 +141,19 @@ const Login = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.7 }}
-              className="flex justify-center py-6"
+              className="flex justify-center items-center py-6"
             >
-              <Button colorScheme="teal" size="lg" type="submit">
+              <Button colorScheme="teal" size="lg" className='mx-3' type="submit">
                 LOGIN
               </Button>
+               <GoogleLogin
+                onSuccess={credentialResponse => {
+                handleGoogleLogin(credentialResponse);
+              }}
+              onError={() => {
+                console.log('Login Failed');
+              }}
+              />
             </motion.div>
           )}
 

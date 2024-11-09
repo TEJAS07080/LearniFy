@@ -53,7 +53,7 @@ export const createCourseController = async (req, res) => {
 
         const course = await CourseModel.create({
             ...req.body,
-            image: imageData, 
+            image: imageData,
         });
 
         res.status(201).json({
@@ -97,10 +97,10 @@ export const updateCourseController = async (req, res) => {
         }
 
         const updatedCourse = await CourseModel.findOneAndUpdate(
-            { _id: id }, 
+            { _id: id },
             {
                 ...req.body,
-                ...(imageData && { image: imageData }), 
+                ...(imageData && { image: imageData }),
             },
             { new: true }
         );
@@ -188,11 +188,11 @@ export const enrollStudentController = async (req, res) => {
         const student = req.params.id
         const { courseId, enrollmentKey } = req.body
         const Course = await CourseModel.findById(courseId)
-        if(Course.students.find((currstudent)=>currstudent==student))
-                return res.status(401).json({
-                    success:false,
-                    message:"Student already enrolled"
-                })
+        if (Course.students.find((currstudent) => currstudent == student))
+            return res.status(401).json({
+                success: false,
+                message: "Student already enrolled"
+            })
         const Student = await UserModel.findById(student)
         if (!Course)
             return res.status(401).json({
@@ -362,7 +362,7 @@ export const getLeaderboard = async (req, res) => {
                 // Debug: Log each submission student and grade
                 console.log(`Submission student ID: ${submission.student}, Grade: ${submission.grade}`);
                 // Find the student in the leaderboard by comparing their ID
-                let index = leaderboard.findIndex((entry) => 
+                let index = leaderboard.findIndex((entry) =>
                     entry.student.toString() == submission.student.toString()
                 );
                 // Ensure student is found in the leaderboard
@@ -380,7 +380,7 @@ export const getLeaderboard = async (req, res) => {
             message: "Leaderboard generated",
             leaderboard
         });
-        
+
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -390,24 +390,24 @@ export const getLeaderboard = async (req, res) => {
     }
 }
 
-export const createRoadmapController=async(req,res)=>{
+export const createRoadmapController = async (req, res) => {
     try {
-        const courseId=req.params.id
-        const course=await CourseModel.findById(courseId)
-        const description=course.description
-        const response=await axios.post(`${process.env.FLASK_URL}/roadmap`,{description},{
-            headers:{
-                "Content-Type":"application/json"
+        const courseId = req.params.id
+        const course = await CourseModel.findById(courseId)
+        const description = course.description
+        const response = await axios.post(`${process.env.FLASK_URL}/roadmap`, { description }, {
+            headers: {
+                "Content-Type": "application/json"
             },
-            withCredentials:true
+            withCredentials: true
         })
-        console.log(response.data);        
-        course.roadmap=response.data.roadmap
+        console.log(response.data);
+        course.roadmap = response.data.roadmap
         course.save()
         res.status(200).json({
-            success:true,
-            message:"Created roadmap successfully",
-            roadmap:course.roadmap
+            success: true,
+            message: "Created roadmap successfully",
+            roadmap: course.roadmap
         })
     } catch (error) {
         console.log(error);
@@ -417,3 +417,66 @@ export const createRoadmapController=async(req,res)=>{
         });
     }
 }
+
+export const uploadContentController = async (request, response) => {
+    try {
+        const courseId = request.params.id;
+        const roadmapId = request.headers.roadmapid;
+
+        // Ensure request.files is defined and check for the expected key 'content'
+        if (!request.files || !request.files.content) {
+            return response.status(400).json({
+                success: false,
+                message: "Please provide a video file in the 'content' field"
+            });
+        }
+
+        const { content } = request.files;
+
+        const course = await CourseModel.findById(courseId);
+        if (!course) {
+            return response.status(400).json({
+                success: false,
+                message: "Course not found"
+            });
+        }
+
+        // Check video MIME type
+        if (!['video/mp4', 'video/webm', 'video/ogg'].includes(content.mimetype)) {
+            return response.status(401).json({
+                success: false,
+                message: "Use only video formats (mp4, webm, ogg)"
+            });
+        }
+
+        // Upload video to cloud and get URL
+        const { public_id, url } = await uploadOnCloud(content.tempFilePath);
+        console.log("public_id, url", public_id, url);
+
+        // Update the specific roadmap item to add the video URL
+        const updatedCourse = await CourseModel.updateOne(
+            { _id: courseId, "roadmap._id": roadmapId },
+            { $push: { "roadmap.$.links": url } }
+        );
+
+        if (updatedCourse.nModified === 0) {
+            return response.status(400).json({
+                success: false,
+                message: "Roadmap item not found"
+            });
+        }
+
+        return response.status(200).json({
+            success: true,
+            message: "Video link added successfully",
+            url
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
+

@@ -4,7 +4,7 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ViewTeacherCourse } from "./pages/index.js";
 import { PageNotFound } from "./components/index.js";
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, ColorModeContext } from '@chakra-ui/react';
 import Home from "./pages/Student/Home.jsx";
 import Courses from "./pages/Student/Courses.jsx";
 import Register from "./pages/Auth/Register.jsx";
@@ -21,7 +21,9 @@ import SignLanguageCourse from "./pages/SignLangugae/signLangCoursePage.jsx";
 import ChakraCalendar from "./pages/Student/Calendar.jsx";
 import Chat from "./pages/Student/Chat.jsx";
 import ChatbotInterface from "./pages/Student/ChatBot.jsx";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import CustomCursor from "./components/CustomCursor";
+
 
 const router = createBrowserRouter([
   {
@@ -100,8 +102,11 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   // <StrictMode>
-  <ChakraProvider>
-    <RouterProvider router={router} />
-  </ChakraProvider>
+  <GoogleOAuthProvider clientId="645530700495-dr8gg3gqsqnasv0s05g4chde2flsc2jv.apps.googleusercontent.com">
+     <ChakraProvider>
+      <RouterProvider router={router} />
+    </ChakraProvider>
+  </GoogleOAuthProvider>
+ 
   /* </StrictMode> */
 );
