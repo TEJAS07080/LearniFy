@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
   Button,
@@ -49,27 +49,81 @@ import {
 } from "../../APIRoutes/index.js";
 import { host } from "../../APIRoutes/index.js";
 import BarGraph from "../../components/bargraph.jsx";
-
 function Roadmap({ roadmap, user }) {
+  const [file, setFile] = useState(null);
+  const fileInputRef = useRef(null); 
+  const { id } = useParams();
+  const toast = useToast();
+  
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    console.log("heer");
+    
+    if (selectedFile) {
+      setFile(selectedFile);
+      console.log("Selected file:", selectedFile);
+    } else {
+      console.log("No file selected.");
+    }
+  };
+
+  const handleUploadContent = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileSubmit = async (roadmapId) => {
+    if (!file) {
+      console.warn("No file selected for upload.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("content", file);
+
+    try {
+      const response = await axios.post(
+        `${host}/teacher/course/roadmap/${id}/content`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "roadmapid": roadmapId,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast({
+          title: "File uploaded successfully",
+          description: response.data.message,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        console.log("File uploaded successfully:", response.data);
+        setFile(null);
+        fileInputRef.current.value = null;
+      } 
+    } catch (error) {
+      toast({
+        title: "Error uploading file",
+        description: "There was an error uploading the file.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      console.error("Error uploading file:", error);
+    }
+  };
+
   return (
     <Accordion allowToggle>
       {roadmap.map((item, index) => (
-        <AccordionItem
-          key={index}
-          borderWidth="1px"
-          borderRadius="md"
-          overflow="hidden"
-          mb={4}
-        >
+        <AccordionItem key={index} borderWidth="1px" borderRadius="md" overflow="hidden" mb={4}>
           <h2>
             <AccordionButton _expanded={{ bg: "teal.50" }} p={4}>
               <HStack spacing={4} w="full">
-                <Circle
-                  size="30px"
-                  bg="teal.500"
-                  color="white"
-                  fontWeight="bold"
-                >
+                <Circle size="30px" bg="teal.500" color="white" fontWeight="bold">
                   {index + 1}
                 </Circle>
                 <Box flex="1" textAlign="left" fontWeight="medium">
@@ -80,21 +134,21 @@ function Roadmap({ roadmap, user }) {
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4} px={6} bg="gray.50">
-            <Text mb={4} color="gray.700">
-              {item.description}
-            </Text>
+            <Text mb={4} color="gray.700">{item.description}</Text>
             <Flex gap={4} wrap="wrap">
-              <Button
-                as={Link}
-                href={item.videoUrl}
-                isExternal
-                variant="outline"
-                colorScheme="blue"
-              >
+              <Button as={Link} href={item.videoUrl} isExternal variant="outline" colorScheme="blue">
                 Watch Video
               </Button>
               {user.role === "Teacher" && (
-                <Button colorScheme="teal">Upload Content</Button>
+                <>
+                  <Button colorScheme="teal" onClick={handleUploadContent}>Upload Content</Button>
+                  <Button colorScheme="blue" onClick={() => handleFileSubmit(item._id)}>Submit</Button>
+                  <Input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                  />
+                </>
               )}
             </Flex>
           </AccordionPanel>
@@ -112,7 +166,6 @@ export default function CourseDetail() {
       user.role === "Student" ? "student-courses" : "teacher-courses"
     )
   );
-  console.log(user);
 
   const toast = useToast();
   const navigate = useNavigate();
@@ -163,10 +216,10 @@ export default function CourseDetail() {
         },
         withCredentials: true,
       });
-      console.log(response.data);
+      // console.log(response.data);
 
       setStudentMarks(response.data.leaderboard);
-      setHisto(true);
+      // setHisto(true);
     } catch (error) {
       console.log("Error fetching leaderboard:", error);
       
