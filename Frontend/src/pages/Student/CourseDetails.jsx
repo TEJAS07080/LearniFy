@@ -105,7 +105,7 @@ export default function CoursePage() {
       });
       return;
     }
-
+   
     const formData = new FormData();
     formData.append("submissionFile", file);
     formData.append("assignmentId", assignmentId);

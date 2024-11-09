@@ -21,7 +21,7 @@ import SignLanguageCourse from "./pages/SignLangugae/signLangCoursePage.jsx";
 import ChakraCalendar from "./pages/Student/Calendar.jsx";
 import Chat from "./pages/Student/Chat.jsx";
 import ChatbotInterface from "./pages/Student/ChatBot.jsx";
-import { ColorModeProvider } from "./Context/ColorModeContext.jsx";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 
 const router = createBrowserRouter([
@@ -101,8 +101,11 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   // <StrictMode>
-  <ChakraProvider>
+  <GoogleOAuthProvider clientId="645530700495-dr8gg3gqsqnasv0s05g4chde2flsc2jv.apps.googleusercontent.com">
+     <ChakraProvider>
       <RouterProvider router={router} />
-  </ChakraProvider>
+    </ChakraProvider>
+  </GoogleOAuthProvider>
+ 
   /* </StrictMode> */
 );
