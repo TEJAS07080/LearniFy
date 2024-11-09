@@ -23,6 +23,7 @@ import {
   FormControl,
   FormLabel,
   Modal,
+  AspectRatio,
   ModalOverlay,
   ModalContent,
   ModalHeader,
@@ -34,11 +35,7 @@ import {
   Icon,
   Badge,
 } from "@chakra-ui/react";
-import {
-  TimeIcon,
-  AttachmentIcon,
-  CheckIcon,
-} from "@chakra-ui/icons";
+import { TimeIcon, AttachmentIcon, CheckIcon } from "@chakra-ui/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import {
@@ -83,16 +80,47 @@ function Roadmap({ roadmap, user }) {
             <Text mb={4} color="gray.700">
               {item.description}
             </Text>
-            <Flex gap={4} wrap="wrap">
-              <Button
-                as={Link}
-                href={item.videoUrl}
-                isExternal
-                variant="outline"
-                colorScheme="blue"
-              >
-                Watch Video
-              </Button>
+
+            <Flex direction="column" gap={4} wrap="wrap">
+              {/* Conditionally render video card or 'No content uploaded' message */}
+              {
+              item.links.length > 0 ? (
+                <Box
+                  width="100%"
+                  borderWidth="1px"
+                  borderRadius="lg"
+                  overflow="hidden"
+                  p={4}
+                  bg="white"
+                >
+                  <Text fontWeight="bold" mb={2} color="gray.700">
+                    Video Content
+                  </Text>
+                  <AspectRatio ratio={16 / 9} width="100%">
+                    <iframe
+                      title="Video Content"
+                      src={item.links}
+                      allowFullScreen
+                      style={{ width: "100%", height: "100%" }} // Ensures iframe fills the AspectRatio
+                    />
+                  </AspectRatio>
+                </Box>
+              ) : (
+                <Box
+                  width="100%"
+                  borderWidth="1px"
+                  borderRadius="lg"
+                  overflow="hidden"
+                  p={4}
+                  bg="white"
+                >
+                  <Text color="gray.600" fontSize="md">
+                    No content uploaded
+                  </Text>
+                </Box>
+              )}
+
+              {/* Upload button for Teachers */}
               {user.role === "Teacher" && (
                 <Button colorScheme="teal">Upload Content</Button>
               )}
@@ -137,8 +165,7 @@ export default function CourseDetail() {
   });
   const [showAssignmentForm, setShowAssignmentForm] = useState(false);
 
-    useEffect(() => {
-      
+  useEffect(() => {
     const fetchAssignments = async () => {
       try {
         const response = await axios.get(`${getAssignments}`, {
@@ -153,27 +180,26 @@ export default function CourseDetail() {
       } catch (error) {
         console.log("Error fetching assignments:", error);
       }
-        };
-        
-        const handleLeaderBoard = async () => {
-    try {
-      const response = await axios.get(`${host}/course/${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
-      console.log(response.data);
+    };
 
-      setStudentMarks(response.data.leaderboard);
-      setHisto(true);
-    } catch (error) {
-      console.log("Error fetching leaderboard:", error);
-      
-    }
-  };
-        fetchAssignments();
-        handleLeaderBoard();
+    const handleLeaderBoard = async () => {
+      try {
+        const response = await axios.get(`${host}/course/${id}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        });
+        console.log(response.data);
+
+        setStudentMarks(response.data.leaderboard);
+        setHisto(true);
+      } catch (error) {
+        console.log("Error fetching leaderboard:", error);
+      }
+    };
+    fetchAssignments();
+    handleLeaderBoard();
   }, [id]);
 
   const handleInputChange = (e) => {
@@ -412,12 +438,9 @@ export default function CourseDetail() {
       }
     } catch (error) {
       console.log(error);
-      
     }
   };
 
-    
-    
   return (
     <Container maxW="container.xl" py={8}>
       <VStack spacing={8} align="stretch">
@@ -584,42 +607,50 @@ export default function CourseDetail() {
                 )}
 
                 {grades[item._id] && (
-  <Modal isOpen={isOpen} onClose={onClose}>
-    <ModalOverlay />
-    <ModalContent maxWidth="80%">
-      <ModalHeader>Your Grade</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        {/* Grade Section */}
-        <Text fontSize="2xl" fontWeight="bold" color="teal.500" mb={4}>
-          Score: {grades[item._id].grade}/10
-        </Text>
+                  <Modal isOpen={isOpen} onClose={onClose}>
+                    <ModalOverlay />
+                    <ModalContent maxWidth="80%">
+                      <ModalHeader>Your Grade</ModalHeader>
+                      <ModalCloseButton />
+                      <ModalBody>
+                        {/* Grade Section */}
+                        <Text
+                          fontSize="2xl"
+                          fontWeight="bold"
+                          color="teal.500"
+                          mb={4}
+                        >
+                          Score: {grades[item._id].grade}/10
+                        </Text>
 
-        {/* Criteria and Feedback Section */}
-        {Object.entries(grades[item._id])
-          .filter(([key]) => key !== "grade") // Exclude 'grade' property
-          .map(([criteria, feedback]) => (
-            <Box key={criteria} mb={4}>
-              {/* Display the criterion */}
-              <Text fontWeight="bold" fontSize="lg" color="gray.700">
-                {criteria}
-              </Text>
-              {/* Display the feedback for the criterion */}
-              <Text color="gray.600" fontSize="md">
-                {feedback}
-              </Text>
-            </Box>
-          ))}
-      </ModalBody>
-      <ModalFooter>
-        <Button colorScheme="blue" onClick={onClose}>
-          Close
-        </Button>
-      </ModalFooter>
-    </ModalContent>
-  </Modal>
-)}
-
+                        {/* Criteria and Feedback Section */}
+                        {Object.entries(grades[item._id])
+                          .filter(([key]) => key !== "grade") // Exclude 'grade' property
+                          .map(([criteria, feedback]) => (
+                            <Box key={criteria} mb={4}>
+                              {/* Display the criterion */}
+                              <Text
+                                fontWeight="bold"
+                                fontSize="lg"
+                                color="gray.700"
+                              >
+                                {criteria}
+                              </Text>
+                              {/* Display the feedback for the criterion */}
+                              <Text color="gray.600" fontSize="md">
+                                {feedback}
+                              </Text>
+                            </Box>
+                          ))}
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button colorScheme="blue" onClick={onClose}>
+                          Close
+                        </Button>
+                      </ModalFooter>
+                    </ModalContent>
+                  </Modal>
+                )}
               </CardBody>
             </Card>
           ))}
