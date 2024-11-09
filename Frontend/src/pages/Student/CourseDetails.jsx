@@ -48,14 +48,14 @@ import { host } from "../../APIRoutes/index.js";
 import BarGraph from "../../components/bargraph.jsx";
 function Roadmap({ roadmap, user }) {
   const [file, setFile] = useState(null);
-  const fileInputRef = useRef(null); 
+  const fileInputRef = useRef(null);
   const { id } = useParams();
   const toast = useToast();
-  
+
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     console.log("heer");
-    
+
     if (selectedFile) {
       setFile(selectedFile);
       console.log("Selected file:", selectedFile);
@@ -84,7 +84,7 @@ function Roadmap({ roadmap, user }) {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            "roadmapid": roadmapId,
+            roadmapid: roadmapId,
           },
         }
       );
@@ -100,7 +100,7 @@ function Roadmap({ roadmap, user }) {
         console.log("File uploaded successfully:", response.data);
         setFile(null);
         fileInputRef.current.value = null;
-      } 
+      }
     } catch (error) {
       toast({
         title: "Error uploading file",
@@ -116,11 +116,22 @@ function Roadmap({ roadmap, user }) {
   return (
     <Accordion allowToggle>
       {roadmap.map((item, index) => (
-        <AccordionItem key={index} borderWidth="1px" borderRadius="md" overflow="hidden" mb={4}>
+        <AccordionItem
+          key={index}
+          borderWidth="1px"
+          borderRadius="md"
+          overflow="hidden"
+          mb={4}
+        >
           <h2>
             <AccordionButton _expanded={{ bg: "teal.50" }} p={4}>
               <HStack spacing={4} w="full">
-                <Circle size="30px" bg="teal.500" color="white" fontWeight="bold">
+                <Circle
+                  size="30px"
+                  bg="teal.500"
+                  color="white"
+                  fontWeight="bold"
+                >
                   {index + 1}
                 </Circle>
                 <Box flex="1" textAlign="left" fontWeight="medium">
@@ -137,8 +148,7 @@ function Roadmap({ roadmap, user }) {
 
             <Flex direction="column" gap={4} wrap="wrap">
               {/* Conditionally render video card or 'No content uploaded' message */}
-              {
-              item.links.length > 0 ? (
+              {item.links.length > 0 ? (
                 <Box
                   width="100%"
                   borderWidth="1px"
@@ -150,12 +160,12 @@ function Roadmap({ roadmap, user }) {
                   <Text fontWeight="bold" mb={2} color="gray.700">
                     Video Content
                   </Text>
-                  <AspectRatio ratio={16 / 9} width="100%">
+                  <AspectRatio ratio={2 / 1} width="100%">
                     <iframe
                       title="Video Content"
-                      src={item.links}
+                      src={item.links[0]}
+                      style={{ width: "100%", height: "100%", border: "none" }}
                       allowFullScreen
-                      style={{ width: "100%", height: "100%" }} // Ensures iframe fills the AspectRatio
                     />
                   </AspectRatio>
                 </Box>
@@ -177,8 +187,15 @@ function Roadmap({ roadmap, user }) {
               {/* Upload button for Teachers */}
               {user.role === "Teacher" && (
                 <>
-                  <Button colorScheme="teal" onClick={handleUploadContent}>Upload Content</Button>
-                  <Button colorScheme="blue" onClick={() => handleFileSubmit(item._id)}>Submit</Button>
+                  <Button colorScheme="teal" onClick={handleUploadContent}>
+                    Upload Content
+                  </Button>
+                  <Button
+                    colorScheme="blue"
+                    onClick={() => handleFileSubmit(item._id)}
+                  >
+                    Submit
+                  </Button>
                   <Input
                     type="file"
                     ref={fileInputRef}
@@ -241,27 +258,26 @@ export default function CourseDetail() {
       } catch (error) {
         console.log("Error fetching assignments:", error);
       }
-        };
-        
-        const handleLeaderBoard = async () => {
-    try {
-      const response = await axios.get(`${host}/course/${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
-      // console.log(response.data);
+    };
 
-      setStudentMarks(response.data.leaderboard);
-      // setHisto(true);
-    } catch (error) {
-      console.log("Error fetching leaderboard:", error);
-      
-    }
-  };
-        fetchAssignments();
-        handleLeaderBoard();
+    const handleLeaderBoard = async () => {
+      try {
+        const response = await axios.get(`${host}/course/${id}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        });
+        // console.log(response.data);
+
+        setStudentMarks(response.data.leaderboard);
+        // setHisto(true);
+      } catch (error) {
+        console.log("Error fetching leaderboard:", error);
+      }
+    };
+    fetchAssignments();
+    handleLeaderBoard();
   }, [id]);
 
   const handleInputChange = (e) => {
