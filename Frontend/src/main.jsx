@@ -101,11 +101,11 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   // <StrictMode>
-  <GoogleOAuthProvider clientId="645530700495-dr8gg3gqsqnasv0s05g4chde2flsc2jv.apps.googleusercontent.com">
-     <ChakraProvider>
+  <GoogleOAuthProvider clientId={`${import.meta.env.VITE_GOOGLE_AUTH_KEY}`}>
+    <ChakraProvider>
       <RouterProvider router={router} />
     </ChakraProvider>
   </GoogleOAuthProvider>
- 
+
   /* </StrictMode> */
 );

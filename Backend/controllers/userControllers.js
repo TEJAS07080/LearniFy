@@ -97,11 +97,11 @@ export const updateProfileController = async (req, res) => {
 
         let imageData = null;
 
-        const user=await UserModel.findById(id)
+        const user = await UserModel.findById(id)
 
         if (req.files) {
-            if(user.image)
-            {const response =await deleteFromCloud(user.image.publicId)
+            if (user.image) {
+                const response = await deleteFromCloud(user.image.publicId)
                 console.log(response);
             }
             const { image } = req.files;
@@ -119,12 +119,12 @@ export const updateProfileController = async (req, res) => {
                 url: img.url,
                 publicId: img.public_id,
             };
-            user.image=imageData
+            user.image = imageData
         }
-        user.name=name
-        user.email=email
-        user.username=username
-        
+        user.name = name
+        user.email = email
+        user.username = username
+
         user.save()
         // const updatedUser = await UserModel.findByIdAndUpdate(
         //     id,
@@ -145,6 +145,30 @@ export const updateProfileController = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+}
+
+export const getUserByEmailController = async (request, response) => {
+    try {
+        const email = request.headers.email;
+        const user = await UserModel.findOne({ email });
+        if (!user) {
+            return response.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+        return response.status(200).json({
+            success: true,
+            message: "User found",
+            user
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).json({
             success: false,
             message: "Internal server error"
         });
