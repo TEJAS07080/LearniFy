@@ -1,37 +1,45 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { FiPlus, FiTrash } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { FaFire } from "react-icons/fa";
 
-export const CustomKanban = () => {
+export const CustomKanban = ({ deadlines }) => {
   return (
     <div className="h-screen w-full bg-neutral-900 rounded-lg text-neutral-50">
-      <Board />
+      <Board deadlines={deadlines} />
     </div>
   );
 };
 
-const Board = () => {
-  const [cards, setCards] = useState(DEFAULT_CARDS);
 
+const Board = ({ deadlines }) => {
+  // console.log(deadlines);
+  const [cards, setCards] = useState(deadlines);
+  useEffect(() => {
+    console.log(deadlines,"Deadline:");
+    
+    setCards(deadlines);
+    console.log(cards);
+    
+  }, [deadlines]);
   return (
     <div className="flex h-full w-full gap-3 overflow-hidden p-12">
       <Column
-        title="Backlog"
+        description="Backlog"
         column="backlog"
         headingColor="text-neutral-500"
         cards={cards}
         setCards={setCards}
       />
       <Column
-        title="TODO"
+        description="TODO"
         column="todo"
         headingColor="text-yellow-200"
         cards={cards}
         setCards={setCards}
       />
       <Column
-        title="Complete"
+        description="Complete"
         column="done"
         headingColor="text-emerald-200"
         cards={cards}
@@ -42,7 +50,7 @@ const Board = () => {
   );
 };
 
-const Column = ({ title, headingColor, cards, column, setCards }) => {
+const Column = ({ description, headingColor, cards, column, setCards }) => {
   const [active, setActive] = useState(false);
 
   const handleDragStart = (e, card) => {
@@ -143,11 +151,12 @@ const Column = ({ title, headingColor, cards, column, setCards }) => {
   };
 
   const filteredCards = cards.filter((c) => c.column === column);
+  console.log(filteredCards);
 
   return (
     <div className="w-56 shrink-0">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className={`font-medium ${headingColor}`}>{title}</h3>
+        <h3 className={`font-medium ${headingColor}`}>{description}</h3>
         <span className="rounded text-sm text-neutral-400">
           {filteredCards.length}
         </span>
@@ -170,7 +179,7 @@ const Column = ({ title, headingColor, cards, column, setCards }) => {
   );
 };
 
-const Card = ({ title, id, column, handleDragStart }) => {
+const Card = ({ description, id, column, handleDragStart }) => {
   return (
     <>
       <DropIndicator beforeId={id} column={column} />
@@ -178,10 +187,10 @@ const Card = ({ title, id, column, handleDragStart }) => {
         layout
         layoutId={id}
         draggable="true"
-        onDragStart={(e) => handleDragStart(e, { title, id, column })}
+        onDragStart={(e) => handleDragStart(e, { description, id, column })}
         className="cursor-grab rounded border border-neutral-700 bg-neutral-800 p-3 active:cursor-grabbing"
       >
-        <p className="text-sm text-neutral-100">{title}</p>
+        <p className="text-sm text-neutral-100">{description}</p>
       </motion.div>
     </>
   );
@@ -244,7 +253,7 @@ const AddCard = ({ column, setCards }) => {
 
     const newCard = {
       column,
-      title: text.trim(),
+      description: text.trim(),
       id: Math.random().toString(),
     };
 
@@ -292,33 +301,3 @@ const AddCard = ({ column, setCards }) => {
     </>
   );
 };
-
-const DEFAULT_CARDS = [
-  // BACKLOG
-  { title: "Look into render bug in dashboard", id: "1", column: "backlog" },
-  { title: "SOX compliance checklist", id: "2", column: "backlog" },
-  { title: "[SPIKE] Migrate to Azure", id: "3", column: "backlog" },
-  { title: "Document Notifications service", id: "4", column: "backlog" },
-  // TODO
-  {
-    title: "Research DB options for new microservice",
-    id: "5",
-    column: "todo",
-  },
-  { title: "Postmortem for outage", id: "6", column: "todo" },
-  { title: "Sync with product on Q3 roadmap", id: "7", column: "todo" },
-
-  // DOING
-  {
-    title: "Refactor context providers to use Zustand",
-    id: "8",
-    column: "doing",
-  },
-  { title: "Add logging to daily CRON", id: "9", column: "doing" },
-  // DONE
-  {
-    title: "Set up DD dashboards for Lambda listener",
-    id: "10",
-    column: "done",
-  },
-];

@@ -39,6 +39,7 @@ const theme = extendTheme({
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
         backgroundColor: "white",
         padding: "20px",
+        height: "auto", // Ensure calendar grows based on its content
       },
       ".react-calendar__tile--active": {
         backgroundColor: "#2196f3 !important",
@@ -119,7 +120,7 @@ export default function AssignmentCalendar() {
             justify="space-between" // Ensures even spacing between Calendar and Deadlines
           >
             {/* Calendar Section */}
-            <Box flex="1" w="100%">
+            <Box flex="1" w="100%" minHeight="500px"> {/* Adjusted minHeight */}
               <Calendar
                 onChange={setSelectedDate}
                 value={selectedDate}
@@ -144,7 +145,7 @@ export default function AssignmentCalendar() {
                       borderColor={deadline.submitted ? "green.200" : "red.200"}
                     >
                       <Text color={textColor} fontWeight="bold" mb={2}>
-                        {deadline.course}
+                        {deadline.title}
                       </Text>
                       <Text color={textColor} mb={2}>
                         {deadline.description}
@@ -165,11 +166,11 @@ export default function AssignmentCalendar() {
           </Flex>
 
           {/* Kanban Section */}
-          <Box mt={8} className="overflow-hidden ">
+          <Box mt={8} className="overflow-hidden">
             <Heading as="h3" size="md" color="brand.600" mb={4}>
-              Kanban Board
+              Manager
             </Heading>
-            <CustomKanban />
+            <CustomKanban deadlines={deadlines}/>
           </Box>
         </Box>
 

@@ -233,10 +233,12 @@ export const getAssignmentByStudent = async (req, res) => {
 
                         // Add to the deadlines array with both deadline and submitted status
                         deadlines.push({
-                            course: course.name,
+                            title: course.name,
                             description: assignment.description,
                             deadline: assignment.deadline,
                             submitted: hasSubmitted,
+                            column: hasSubmitted ? 'done' : 'backlog',
+                            id: assignment._id,
                         });
                     }
                 }
@@ -249,7 +251,6 @@ export const getAssignmentByStudent = async (req, res) => {
             message: 'Assignments Fetched',
             deadlines
         });
-        console.log(deadlines);
         
 
     } catch (error) {
