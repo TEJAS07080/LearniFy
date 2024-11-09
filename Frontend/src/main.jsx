@@ -4,7 +4,7 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ViewTeacherCourse } from "./pages/index.js";
 import { PageNotFound } from "./components/index.js";
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, ColorModeContext } from '@chakra-ui/react';
 import Home from "./pages/Student/Home.jsx";
 import Courses from "./pages/Student/Courses.jsx";
 import Register from "./pages/Auth/Register.jsx";
@@ -21,6 +21,8 @@ import SignLanguageCourse from "./pages/SignLangugae/signLangCoursePage.jsx";
 import ChakraCalendar from "./pages/Student/Calendar.jsx";
 import Chat from "./pages/Student/Chat.jsx";
 import ChatbotInterface from "./pages/Student/ChatBot.jsx";
+import { ColorModeProvider } from "./Context/ColorModeContext.jsx";
+
 
 const router = createBrowserRouter([
   {
@@ -100,7 +102,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   // <StrictMode>
   <ChakraProvider>
-    <RouterProvider router={router} />
+      <RouterProvider router={router} />
   </ChakraProvider>
   /* </StrictMode> */
 );
