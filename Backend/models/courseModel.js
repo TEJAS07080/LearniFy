@@ -1,26 +1,26 @@
 import mongoose from "mongoose";
 
-const CourseSchema=new mongoose.Schema({
-    name:{
-        type:String,
-        required:true,
+const CourseSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
     },
-    branch:{
-        type:String,
-        enum:['Computer Engineering','Data Science','Machine Learning','EXTC'],
-        required:true,
+    branch: {
+        type: String,
+        enum: ['Computer Engineering', 'Data Science', 'Machine Learning', 'EXTC'],
+        required: true,
     },
-    enrollmentKey:{
-        type:String,
-        required:true
+    enrollmentKey: {
+        type: String,
+        required: true
     },
-    instructor:{
-        type:mongoose.Types.ObjectId,
-        required:true
+    instructor: {
+        type: mongoose.Types.ObjectId,
+        required: true
     },
-    description:{
-        type:String,
-        required:true,
+    description: {
+        type: String,
+        required: true,
     },
     image: {
         url: {
@@ -30,20 +30,20 @@ const CourseSchema=new mongoose.Schema({
             type: String,
         }
     },
-    students:{
-        type:[mongoose.Types.ObjectId],
-        default:[]
+    students: {
+        type: [mongoose.Types.ObjectId],
+        default: []
     },
-    assignments:{
-        type:[mongoose.Types.ObjectId],
-        default:[]
+    assignments: {
+        type: [mongoose.Types.ObjectId],
+        default: []
     },
-    leaderboard:{
-        type:{
-            student:mongoose.Types.ObjectId,
-            marks:{
-                type:Number,
-                default:0
+    leaderboard: {
+        type: {
+            student: mongoose.Types.ObjectId,
+            marks: {
+                type: Number,
+                default: 0
             }
         }
     },
@@ -62,13 +62,14 @@ const CourseSchema=new mongoose.Schema({
         ],
         default: []
     },
-    roadmap:{
-        type:[{
-            title:String,
-            description:String,
+    roadmap: {
+        type: [{
+            title: String,
+            description: String,
+            links: { type: [String], default: [] }
         }],
-        default:[]
+        default: []
     }
 })
 
-export const CourseModel = mongoose.model('courses',CourseSchema)
+export const CourseModel = mongoose.model('courses', CourseSchema)
