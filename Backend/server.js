@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import 'colors'
+import fileUpload from 'express-fileupload';
 import { dbConnect } from './database/dbConnect.js'
 import { userRouter } from './routes/userRoutes.js'
 import { adminRouter } from './routes/adminRoutes.js'
@@ -21,6 +22,10 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+app.use(fileUpload({
+    useTempFiles: true,
+    tempFileDir: 'C:/Windows/Temp'
+}));
 app.use(cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
