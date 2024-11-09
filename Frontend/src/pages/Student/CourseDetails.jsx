@@ -34,6 +34,7 @@ import {
   Link,
   Icon,
   Badge,
+  Spinner
 } from "@chakra-ui/react";
 import { TimeIcon, AttachmentIcon, CheckIcon } from "@chakra-ui/icons";
 import { useNavigate, useParams } from "react-router-dom";
@@ -46,6 +47,8 @@ import {
 } from "../../APIRoutes/index.js";
 import { host } from "../../APIRoutes/index.js";
 import BarGraph from "../../components/bargraph.jsx";
+
+
 function Roadmap({ roadmap, user }) {
   const [file, setFile] = useState(null);
   const fileInputRef = useRef(null);
@@ -519,6 +522,41 @@ export default function CourseDetail() {
     }
   };
 
+ 
+function GradeButton({ item, grades, handleGrade,onOpen }) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCalculateGrade = async (id) => {
+    setIsLoading(true); // Show loading indicator
+    await handleGrade(id); // Call the grade calculation function
+    setIsLoading(false); // Hide loading indicator once done
+  };
+
+  return (
+    <>
+      {grades[item._id] === undefined ? (
+        <Button
+          colorScheme="blue"
+          onClick={() => handleCalculateGrade(item._id)}
+          width="48%"
+          size="lg"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <Spinner size="md" color="white" /> // Show spinner while loading
+          ) : (
+            "Calculate Grade"
+          )}
+        </Button>
+      ) : (
+        <Button colorScheme="blue" width="48%" size="lg" onClick={onOpen}>
+          See Grade
+        </Button>
+      )}
+    </>
+  );
+}
+
   return (
     <Container maxW="container.xl" py={8}>
       <VStack spacing={8} align="stretch">
@@ -660,26 +698,8 @@ export default function CourseDetail() {
                           Submit
                         </Button>
                       )}
-
-                      {grades[item._id] === undefined ? (
-                        <Button
-                          colorScheme="blue" // Blue color for grade-related action
-                          onClick={() => handleGrade(item._id)}
-                          width="48%"
-                          size="lg"
-                        >
-                          Calculate Grade
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={onOpen}
-                          colorScheme="blue" // Blue color for grade-related action
-                          width="48%"
-                          size="lg"
-                        >
-                          See Grade
-                        </Button>
-                      )}
+                      <GradeButton item={item} grades={grades} handleGrade={handleGrade} onOpen={onOpen}></GradeButton>
+                
                     </HStack>
                   </VStack>
                 )}
