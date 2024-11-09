@@ -21,6 +21,7 @@ import SignLanguageCourse from "./pages/SignLangugae/signLangCoursePage.jsx";
 import ChakraCalendar from "./pages/Student/Calendar.jsx";
 import Chat from "./pages/Student/Chat.jsx";
 import ChatbotInterface from "./pages/Student/ChatBot.jsx";
+import CustomCursor from "./components/CustomCursor";
 
 const router = createBrowserRouter([
   {
@@ -100,6 +101,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   // <StrictMode>
   <ChakraProvider>
+    <CustomCursor />
     <RouterProvider router={router} />
   </ChakraProvider>
   /* </StrictMode> */
