@@ -37,7 +37,7 @@ const Sidebar = () => {
       <TitleSection open={open} />
       <div className="space-y-1">
         <SidebarLink to={`${user.role === "Student" ? "/home" : "/home/teacher"}`} title="Dashboard" Icon={FiHome} selected={selected} setSelected={setSelected} open={open} />
-        <SidebarLink to={user.role === "Student" ? "/home" : "/home/teacher-add-course"} title={user.role === "Student" ? "Assignments" : "Add Courses"} Icon={MdAssignment} selected={selected} setSelected={setSelected} open={open} notifs={3} />
+        <SidebarLink to={user.role === "Student" ? "/home" : "/home/teacher-add-course"} title={user.role === "Student" ? "Assignments" : "Add Courses"} Icon={MdAssignment} selected={selected} setSelected={setSelected} open={open} />
         {user.role === "Student" && (
           <SidebarLink to="/home/mycourses" title="My Courses" Icon={MdOutlineMenuBook} selected={selected} setSelected={setSelected} open={open} />
         )}
