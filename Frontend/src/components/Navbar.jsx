@@ -48,12 +48,12 @@ const Navbar = () => {
                   Home
                 </Button>
               </Link>
-              <Link as={RouterLink} to="/courses" mr={4}>
+              <Link as={RouterLink} to="/home/mycourses" mr={4}>
                 <Button variant="ghost" color={textColor}>
                   Courses
                 </Button>
               </Link>
-              <Link as={RouterLink} to="/ai-assistant" mr={4}>
+              <Link as={RouterLink} to="/home/chat" mr={4}>
                 <Button variant="ghost" color={textColor}>
                   AI Assistant
                 </Button>

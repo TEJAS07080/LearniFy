@@ -71,3 +71,15 @@ li:last-child {
   color: white;
   border-radius: 25%;
 }
+
+
+/* CSS */
+.custom-kanban {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.custom-kanban::-webkit-scrollbar {
+  display: none;
+}
