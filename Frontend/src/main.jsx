@@ -22,6 +22,7 @@ import ChakraCalendar from "./pages/Student/Calendar.jsx";
 import Chat from "./pages/Student/Chat.jsx";
 import ChatbotInterface from "./pages/Student/ChatBot.jsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import CustomCursor from "./components/CustomCursor";
 
 
 const router = createBrowserRouter([
