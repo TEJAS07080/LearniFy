@@ -79,8 +79,9 @@ const Login = () => {
             className="flex flex-col gap-4"
           >
             <FormControl>
-              <FormLabel>Email</FormLabel>
+              <FormLabel style={{color:'black'}}>Email</FormLabel>
               <Input
+                style={{borderColor:'#a3a3a3',color:'black'}}
                 type="email"
                 onChange={(event) => {
                   setUserData({
@@ -91,8 +92,9 @@ const Login = () => {
               />
             </FormControl>
             <FormControl>
-              <FormLabel>Password</FormLabel>
+              <FormLabel style={{color:'black'}}>Password</FormLabel>
               <Input
+                style={{borderColor:'#a3a3a3',color:'black'}}
                 type="password"
                 onChange={(event) => {
                   setUserData({
