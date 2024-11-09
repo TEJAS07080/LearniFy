@@ -101,7 +101,6 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   // <StrictMode>
   <ChakraProvider>
-    <CustomCursor />
     <RouterProvider router={router} />
   </ChakraProvider>
   /* </StrictMode> */
