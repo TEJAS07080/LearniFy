@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
   Button,
@@ -23,6 +23,7 @@ import {
   FormControl,
   FormLabel,
   Modal,
+  AspectRatio,
   ModalOverlay,
   ModalContent,
   ModalHeader,
@@ -33,12 +34,9 @@ import {
   Link,
   Icon,
   Badge,
+  Spinner
 } from "@chakra-ui/react";
-import {
-  TimeIcon,
-  AttachmentIcon,
-  CheckIcon,
-} from "@chakra-ui/icons";
+import { TimeIcon, AttachmentIcon, CheckIcon } from "@chakra-ui/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import {
@@ -50,7 +48,74 @@ import {
 import { host } from "../../APIRoutes/index.js";
 import BarGraph from "../../components/bargraph.jsx";
 
+
 function Roadmap({ roadmap, user }) {
+  const [file, setFile] = useState(null);
+  const fileInputRef = useRef(null);
+  const { id } = useParams();
+  const toast = useToast();
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    console.log("heer");
+
+    if (selectedFile) {
+      setFile(selectedFile);
+      console.log("Selected file:", selectedFile);
+    } else {
+      console.log("No file selected.");
+    }
+  };
+
+  const handleUploadContent = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileSubmit = async (roadmapId) => {
+    if (!file) {
+      console.warn("No file selected for upload.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("content", file);
+
+    try {
+      const response = await axios.post(
+        `${host}/teacher/course/roadmap/${id}/content`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            roadmapid: roadmapId,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast({
+          title: "File uploaded successfully",
+          description: response.data.message,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        console.log("File uploaded successfully:", response.data);
+        setFile(null);
+        fileInputRef.current.value = null;
+      }
+    } catch (error) {
+      toast({
+        title: "Error uploading file",
+        description: "There was an error uploading the file.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      console.error("Error uploading file:", error);
+    }
+  };
+
   return (
     <Accordion allowToggle>
       {roadmap.map((item, index) => (
@@ -83,18 +148,63 @@ function Roadmap({ roadmap, user }) {
             <Text mb={4} color="gray.700">
               {item.description}
             </Text>
-            <Flex gap={4} wrap="wrap">
-              <Button
-                as={Link}
-                href={item.videoUrl}
-                isExternal
-                variant="outline"
-                colorScheme="blue"
-              >
-                Watch Video
-              </Button>
+
+            <Flex direction="column" gap={4} wrap="wrap">
+              {/* Conditionally render video card or 'No content uploaded' message */}
+              {item.links.length > 0 ? (
+                <Box
+                  width="100%"
+                  borderWidth="1px"
+                  borderRadius="lg"
+                  overflow="hidden"
+                  p={4}
+                  bg="white"
+                >
+                  <Text fontWeight="bold" mb={2} color="gray.700">
+                    Video Content
+                  </Text>
+                  <AspectRatio ratio={2 / 1} width="100%">
+                    <iframe
+                      title="Video Content"
+                      src={item.links[0]}
+                      style={{ width: "100%", height: "100%", border: "none" }}
+                      allowFullScreen
+                    />
+                  </AspectRatio>
+                </Box>
+              ) : (
+                <Box
+                  width="100%"
+                  borderWidth="1px"
+                  borderRadius="lg"
+                  overflow="hidden"
+                  p={4}
+                  bg="white"
+                >
+                  <Text color="gray.600" fontSize="md">
+                    No content uploaded
+                  </Text>
+                </Box>
+              )}
+
+              {/* Upload button for Teachers */}
               {user.role === "Teacher" && (
-                <Button colorScheme="teal">Upload Content</Button>
+                <>
+                  <Button colorScheme="teal" onClick={handleUploadContent}>
+                    Upload Content
+                  </Button>
+                  <Button
+                    colorScheme="blue"
+                    onClick={() => handleFileSubmit(item._id)}
+                  >
+                    Submit
+                  </Button>
+                  <Input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                  />
+                </>
               )}
             </Flex>
           </AccordionPanel>
@@ -112,7 +222,6 @@ export default function CourseDetail() {
       user.role === "Student" ? "student-courses" : "teacher-courses"
     )
   );
-  console.log(user);
 
   const toast = useToast();
   const navigate = useNavigate();
@@ -137,8 +246,7 @@ export default function CourseDetail() {
   });
   const [showAssignmentForm, setShowAssignmentForm] = useState(false);
 
-    useEffect(() => {
-      
+  useEffect(() => {
     const fetchAssignments = async () => {
       try {
         const response = await axios.get(`${getAssignments}`, {
@@ -153,27 +261,26 @@ export default function CourseDetail() {
       } catch (error) {
         console.log("Error fetching assignments:", error);
       }
-        };
-        
-        const handleLeaderBoard = async () => {
-    try {
-      const response = await axios.get(`${host}/course/${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
-      console.log(response.data);
+    };
 
-      setStudentMarks(response.data.leaderboard);
-      setHisto(true);
-    } catch (error) {
-      console.log("Error fetching leaderboard:", error);
-      
-    }
-  };
-        fetchAssignments();
-        handleLeaderBoard();
+    const handleLeaderBoard = async () => {
+      try {
+        const response = await axios.get(`${host}/course/${id}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        });
+        // console.log(response.data);
+
+        setStudentMarks(response.data.leaderboard);
+        // setHisto(true);
+      } catch (error) {
+        console.log("Error fetching leaderboard:", error);
+      }
+    };
+    fetchAssignments();
+    handleLeaderBoard();
   }, [id]);
 
   const handleInputChange = (e) => {
@@ -412,12 +519,44 @@ export default function CourseDetail() {
       }
     } catch (error) {
       console.log(error);
-      
     }
   };
 
-    
-    
+ 
+function GradeButton({ item, grades, handleGrade,onOpen }) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCalculateGrade = async (id) => {
+    setIsLoading(true); // Show loading indicator
+    await handleGrade(id); // Call the grade calculation function
+    setIsLoading(false); // Hide loading indicator once done
+  };
+
+  return (
+    <>
+      {grades[item._id] === undefined ? (
+        <Button
+          colorScheme="blue"
+          onClick={() => handleCalculateGrade(item._id)}
+          width="48%"
+          size="lg"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <Spinner size="md" color="white" /> // Show spinner while loading
+          ) : (
+            "Calculate Grade"
+          )}
+        </Button>
+      ) : (
+        <Button colorScheme="blue" width="48%" size="lg" onClick={onOpen}>
+          See Grade
+        </Button>
+      )}
+    </>
+  );
+}
+
   return (
     <Container maxW="container.xl" py={8}>
       <VStack spacing={8} align="stretch">
@@ -559,67 +698,57 @@ export default function CourseDetail() {
                           Submit
                         </Button>
                       )}
-
-                      {grades[item._id] === undefined ? (
-                        <Button
-                          colorScheme="blue" // Blue color for grade-related action
-                          onClick={() => handleGrade(item._id)}
-                          width="48%"
-                          size="lg"
-                        >
-                          Calculate Grade
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={onOpen}
-                          colorScheme="blue" // Blue color for grade-related action
-                          width="48%"
-                          size="lg"
-                        >
-                          See Grade
-                        </Button>
-                      )}
+                      <GradeButton item={item} grades={grades} handleGrade={handleGrade} onOpen={onOpen}></GradeButton>
+                
                     </HStack>
                   </VStack>
                 )}
 
                 {grades[item._id] && (
-  <Modal isOpen={isOpen} onClose={onClose}>
-    <ModalOverlay />
-    <ModalContent maxWidth="80%">
-      <ModalHeader>Your Grade</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        {/* Grade Section */}
-        <Text fontSize="2xl" fontWeight="bold" color="teal.500" mb={4}>
-          Score: {grades[item._id].grade}/10
-        </Text>
+                  <Modal isOpen={isOpen} onClose={onClose}>
+                    <ModalOverlay />
+                    <ModalContent maxWidth="80%">
+                      <ModalHeader>Your Grade</ModalHeader>
+                      <ModalCloseButton />
+                      <ModalBody>
+                        {/* Grade Section */}
+                        <Text
+                          fontSize="2xl"
+                          fontWeight="bold"
+                          color="teal.500"
+                          mb={4}
+                        >
+                          Score: {grades[item._id].grade}/10
+                        </Text>
 
-        {/* Criteria and Feedback Section */}
-        {Object.entries(grades[item._id])
-          .filter(([key]) => key !== "grade") // Exclude 'grade' property
-          .map(([criteria, feedback]) => (
-            <Box key={criteria} mb={4}>
-              {/* Display the criterion */}
-              <Text fontWeight="bold" fontSize="lg" color="gray.700">
-                {criteria}
-              </Text>
-              {/* Display the feedback for the criterion */}
-              <Text color="gray.600" fontSize="md">
-                {feedback}
-              </Text>
-            </Box>
-          ))}
-      </ModalBody>
-      <ModalFooter>
-        <Button colorScheme="blue" onClick={onClose}>
-          Close
-        </Button>
-      </ModalFooter>
-    </ModalContent>
-  </Modal>
-)}
-
+                        {/* Criteria and Feedback Section */}
+                        {Object.entries(grades[item._id])
+                          .filter(([key]) => key !== "grade") // Exclude 'grade' property
+                          .map(([criteria, feedback]) => (
+                            <Box key={criteria} mb={4}>
+                              {/* Display the criterion */}
+                              <Text
+                                fontWeight="bold"
+                                fontSize="lg"
+                                color="gray.700"
+                              >
+                                {criteria}
+                              </Text>
+                              {/* Display the feedback for the criterion */}
+                              <Text color="gray.600" fontSize="md">
+                                {feedback}
+                              </Text>
+                            </Box>
+                          ))}
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button colorScheme="blue" onClick={onClose}>
+                          Close
+                        </Button>
+                      </ModalFooter>
+                    </ModalContent>
+                  </Modal>
+                )}
               </CardBody>
             </Card>
           ))}
